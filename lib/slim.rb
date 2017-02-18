@@ -1,4 +1,5 @@
 require 'temple'
+require 'active_support/deprecation'
 require 'slim/parser'
 require 'slim/filter'
 require 'slim/end_inserter'

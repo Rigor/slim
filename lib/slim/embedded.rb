@@ -271,7 +271,7 @@ module Slim
 
   def self.const_missing(name)
     super unless name == :EmbeddedEngine
-    warn 'Slim::EmbeddedEngine is deprecated, it is called Slim::Embedded in Slim 2.0'
+    ActiveSupport::Deprecation.warn('Slim::EmbeddedEngine is deprecated, it is called Slim::Embedded in Slim 2.0')
     Embedded
   end
 end

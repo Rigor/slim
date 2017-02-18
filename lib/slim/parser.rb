@@ -92,7 +92,10 @@ module Slim
 
     # Convert deprecated string shortcut to hash
     def deprecated_shortcut(v)
-      warn "Slim :shortcut string values are deprecated and unsupported in Slim 2.0, use hash like { '#' => { :tag => 'div', :attr => 'id' } }"
+      msg = "Slim :shortcut string values are deprecated and unsupported in Slim 2.0, use hash like "\
+        "{ '#' => { :tag => 'div', :attr => 'id' } }"
+      ActiveSupport::Deprecation.warn(msg)
+
       if v =~ /\A([^\s]+)\s+([^\s]+)\Z/
         { :tag => $1, :attr => $2 }
       else
@@ -392,7 +395,9 @@ module Slim
       delimiter = nil
       if @line =~ ATTR_DELIM_REGEX
         if $&.size > 1
-          warn "#{options[:file]}:#{@lineno} - spaces around attribute delimiters will be allowed in Slim 2.0. Your code is incompatible."
+          msg = "#{options[:file]}:#{@lineno} - spaces around attribute delimiters will be allowed in Slim 2.0. "\
+            "Your code is incompatible."
+          ActiveSupport::Deprecation.warn(msg)
         else
           delimiter = DELIMITERS[$&]
           @line.slice!(0)
@@ -418,7 +423,10 @@ module Slim
           quote = $3
           value = parse_quoted_attribute(quote)
           if escape && !options[:escape_quoted_attrs] && value =~ /&(amp|quot|gt|lt);/
-            warn "#{options[:file]}:#{@lineno} - quoted attribute value '#{value}' might be double escaped in Slim 2.0. Remove manually escaped entities and set :escape_quoted_attrs => true! :escaped_quoted_attrs is activated on Slim 2.0 by default."
+            msg = "#{options[:file]}:#{@lineno} - quoted attribute value '#{value}' might be double escaped "\
+              "in Slim 2.0. Remove manually escaped entities and set :escape_quoted_attrs => true! "\
+              ":escaped_quoted_attrs is activated on Slim 2.0 by default."
+            ActiveSupport::Deprecation.warn(msg)
           end
           attributes << [:html, :attr, name,
                          [:escape, options[:escape_quoted_attrs] && escape,
@@ -432,14 +440,18 @@ module Slim
           # Remove attribute wrapper which doesn't belong to the ruby code
           # e.g id=[hash[:a] + hash[:b]]
           if value =~ /\A[\[\{]/ && DELIMITERS[$&] == value[-1, 1]
-            warn "#{options[:file]}:#{@lineno} - ruby attribute value #{value} with curly braces/brackets is deprecated and unsupported in Slim 2.0. Use parentheses!"
+            msg = "#{options[:file]}:#{@lineno} - ruby attribute value #{value} with curly braces/brackets is "\
+              "deprecated and unsupported in Slim 2.0. Use parentheses!"
+            ActiveSupport::Deprecation.warn(msg)
             value = value[1..-2]
           end
           syntax_error!('Invalid empty attribute') if value.empty?
           attributes << [:html, :attr, name, [:slim, :attrvalue, escape, value]]
         else
           if @line =~ QUOTED_ATTR_REGEX_20 || @line =~ CODE_ATTR_REGEX_20
-            warn "#{options[:file]}:#{@lineno} - you have spaces around =, this will be interpreted as attribute in Slim 2.0."
+            msg = "#{options[:file]}:#{@lineno} - you have spaces around =, this will be interpreted as attribute in "\
+              "Slim 2.0."
+            ActiveSupport::Deprecation.warn(msg)
           end
 
           break unless delimiter
